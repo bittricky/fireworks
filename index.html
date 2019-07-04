@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Fireworks</title>
+    <link href="style.css" rel="stylesheet">
+    <script>
+        // Load main.js script after document has rendered.
+        let script = document.createElement('script');
+        script.src = 'main.js';
+        script.type = 'text/javascript';
+        document.getElementsByTagName('head')[0].appendChild(script);
+    </script>
+  </head>
+  <body>
+      <canvas id="canvas">Your browser does not support the 'canvas' element.</canvas>
+  </body>
+</html>
