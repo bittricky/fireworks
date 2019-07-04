@@ -119,6 +119,81 @@ function cleanCanvas() {
     context.globalCompositeOperation = 'lighter';
 }
 
+// Create particle explosion at 'x' and 'y' coordinates.
+function createParticles(x, y) {
+    // Set particle count.
+    // Higher numbers may reduce performance.
+    let particleCount = PARTICLE_COUNT;
+    while(particleCount--) {
+        // Create a new particle and add it to particles collection.
+        particles.push(new Particle(x, y));
+    }
+}
+
+// Launch fireworks automatically.
+function launchAutomatedFirework() {
+    // Determine if ticks since last automated launch is greater than random min/max values.
+    if(ticksSinceFireworkAutomated >= random(TICKS_PER_FIREWORK_AUTOMATED_MIN, TICKS_PER_FIREWORK_AUTOMATED_MAX)) {
+        // Check if mouse is not currently clicked.
+        if(!isMouseDown) {
+            // Set start position to bottom center.
+            let startX = canvas.width / 2;
+            let startY = canvas.height;
+            // Set end position to random position, somewhere in the top half of screen.
+            let endX = random(0, canvas.width);
+            let endY = random(0, canvas.height / 2);
+            // Create new firework and add to collection.
+            fireworks.push(new Firework(startX, startY, endX, endY));
+            // Reset tick counter.
+            ticksSinceFireworkAutomated = 0;
+        }
+    } else {
+        // Increment counter.
+        ticksSinceFireworkAutomated++;
+    }
+}
+
+// Launch fireworks manually, if mouse is pressed.
+function launchManualFirework() {
+    // Check if ticks since last firework launch is less than minimum value.
+    if(ticksSinceFirework >= TICKS_PER_FIREWORK_MIN) {
+        // Check if mouse is down.
+        if(isMouseDown) {
+            // Set start position to bottom center.
+            let startX = canvas.width / 2;
+            let startY = canvas.height;
+            // Set end position to current mouse position.
+            let endX = mouseX;
+            let endY = mouseY;
+            // Create new firework and add to collection.
+            fireworks.push(new Firework(startX, startY, endX, endY));
+            // Reset tick counter.
+            ticksSinceFirework = 0;
+        }
+    } else {
+        // Increment counter.
+        ticksSinceFirework++;
+    }
+}
+
+// Update all active fireworks.
+function updateFireworks() {
+    // Loop backwards through all fireworks, drawing and updating each.
+    for (let i = fireworks.length - 1; i >= 0; --i) {
+        fireworks[i].draw();
+        fireworks[i].update(i);
+    }
+}
+
+// Update all active particles.
+function updateParticles() {
+    // Loop backwards through all particles, drawing and updating each.
+    for (let i = particles.length - 1; i >= 0; --i) {
+        particles[i].draw();
+        particles[i].update(i);
+    }
+}
+
 // === END HELPERS ===
 
 // === EVENT LISTENERS ===
@@ -321,3 +396,29 @@ Particle.prototype.draw = function() {
 }
 
 // === END PROTOTYPING ===
+// Primary loop.
+function loop() {
+    // Smoothly request animation frame for each loop iteration.
+    requestAnimFrame(loop);
+
+    // Adjusts coloration of fireworks over time.
+    hue += HUE_STEP_INCREASE;
+
+    // Clean the canvas.
+    cleanCanvas();
+
+    // Update fireworks.
+    updateFireworks();
+
+    // Update particles.
+    updateParticles();
+
+    // Launch automated fireworks.
+    launchAutomatedFirework();
+
+    // Launch manual fireworks.
+    launchManualFirework();
+}
+
+// Initiate loop after window loads.
+window.onload = loop;
